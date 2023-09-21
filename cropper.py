@@ -4,20 +4,30 @@ from tqdm import tqdm
 import re
 
 
-def main():
-    examguru_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'morderns_11_math')
 
-    input_folder = os.path.join(examguru_folder, 'unedited')
-    output_folder = os.path.join(examguru_folder, 'cropped')
-    left_crop_percent = 30
-    right_crop_percent = 30
+folders = ['oswaal_SQP_sci_10']
+
+
+def main():
+    for f in folders:
+        folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), f)
+        print(f"Processing: {folder}")
+        process_folder(folder)
+        print(f"{folder} Completed")
+
+
+def process_folder(folder):
+    input_folder = os.path.join(folder, 'unedited')
+    output_folder = os.path.join(folder, 'cropped')
+    left_crop_percent = 31
+    right_crop_percent = 31
     top_crop_percent = 0
     bottom_crop_percent = 0
 
     files = (os.listdir(input_folder))
-    
+
     sorted_files = sorted(files, key=lambda filename: int(re.search(r'\((\d+)\)', filename).group(1)) if re.search(r'\((\d+)\)', filename) else 0)
-    
+
     first_file_number = sorted_files[0].replace("Screenshot (", "").replace(").png", "")
     page_correction = int(first_file_number)
 
@@ -29,10 +39,10 @@ def crop_horizontal(image_path, left_crop_percent, right_crop_percent,top_crop_p
     original_width, original_height = image.size
     left_crop = int(original_width * (left_crop_percent / 100))
     right_crop = int(original_width * (right_crop_percent / 100))
-    top_crop = int(original_width * (top_crop_percent / 100))
-    bottom_crop = int(original_width * (bottom_crop_percent / 100))
-    #cropped_image = image.crop((left_crop, top_crop, original_width - right_crop, original_height-bottom_crop))
-    cropped_image = image.crop((left_crop, 0, original_width - right_crop, original_height))
+    top_crop = int(original_height * (top_crop_percent / 100))
+    bottom_crop = int(original_height * (bottom_crop_percent / 100))
+    cropped_image = image.crop((left_crop, top_crop, original_width - right_crop, original_height-bottom_crop))
+    #cropped_image = image.crop((left_crop, 0, original_width - right_crop, original_height))
     cropped_image.save(output_path)
 
 def crop_images_in_folder(input_folder, sorted_files, output_folder, left_crop_percent, right_crop_percent,top_crop_percent, bottom_crop_percent, page_correction):
